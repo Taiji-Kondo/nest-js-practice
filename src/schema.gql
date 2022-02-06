@@ -13,7 +13,16 @@ type Mutation {
   updateUser(id: Float!, updateUserInput: UpdateUserInput!): User!
 }
 
+type Post {
+  author: User!
+  content: String!
+  id: Int!
+  title: String!
+  userId: Int!
+}
+
 type Query {
+  posts: [Post!]!
   user(id: Int!): User!
   users: [User!]!
 }
