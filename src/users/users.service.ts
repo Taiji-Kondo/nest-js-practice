@@ -1,38 +1,84 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserInput } from './dto/create-user.input';
-import { UpdateUserInput } from './dto/update-user.input';
 import {User} from "./entities/user.entity";
+import {PrismaService} from "../prisma/prisma.service";
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
-  private users: User[] = [{id: 1, name: 'test1'}];
+  constructor(private prisma: PrismaService) {}
 
-  create(createUserInput: CreateUserInput) {
-    const id = this.users.at(-1).id + 1
-    this.users.push({id, ...createUserInput})
-    return createUserInput
+  async user(userWhereUniqueInput: Prisma.UserWhereUniqueInput): Promise<User | null> {
+    return this.prisma.user.findUnique({
+      where: userWhereUniqueInput,
+    });
   }
 
-  findAll() {
-    return this.users;
+  async users(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.UserWhereUniqueInput;
+    where?: Prisma.UserWhereInput;
+    orderBy?: Prisma.UserOrderByWithRelationInput;
+  }): Promise<User[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.user.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+    });
   }
 
-  findOne(id: number) {
-    return this.users.find((user) => user.id === id);
+  async createUser(data: Prisma.UserCreateInput): Promise<User> {
+    return this.prisma.user.create({
+      data,
+    });
   }
 
-  update(id: number, updateUserInput: UpdateUserInput) {
-    const targetUser = this.findOne(id);
-
-    targetUser.name = updateUserInput.name;
-
-    return targetUser;
+  async updateUser(params: {
+    where: Prisma.UserWhereUniqueInput;
+    data: Prisma.UserUpdateInput;
+  }): Promise<User> {
+    const { where, data } = params;
+    return this.prisma.user.update({
+      data,
+      where,
+    });
   }
 
-  remove(id: number) {
-    const targetUser = this.findOne(id);
-    this.users = this.users.filter((user) => user.id !== id);
-
-    return targetUser;
+  async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User> {
+    return this.prisma.user.delete({
+      where,
+    });
   }
+  //
+  // create(createUserInput: CreateUserInput) {
+  //   const id = this.users.at(-1).id + 1
+  //   this.users.push({id, ...createUserInput})
+  //   return createUserInput
+  // }
+  //
+  // findAll() {
+  //   return this.users;
+  // }
+  //
+  // findOne(id: number) {
+  //   return this.users.find((user) => user.id === id);
+  // }
+  //
+  // update(id: number, updateUserInput: UpdateUserInput) {
+  //   const targetUser = this.findOne(id);
+  //
+  //   targetUser.name = updateUserInput.name;
+  //
+  //   return targetUser;
+  // }
+  //
+  // remove(id: number) {
+  //   const targetUser = this.findOne(id);
+  //   this.users = this.users.filter((user) => user.id !== id);
+  //
+  //   return targetUser;
+  // }
 }

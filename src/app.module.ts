@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
-import { UserController } from './user/user.controller';
 import {GraphQLModule} from "@nestjs/graphql";
 import { join } from 'path';
+import { PrismaService } from './prisma/prisma.service';
 
 
 @Module({
@@ -15,7 +15,7 @@ import { join } from 'path';
       // 生成されたschemaを自動でsortされるためのオプションをオンにする
       sortSchema: true,
     }),],
-  controllers: [AppController, UserController],
-  providers: [AppService],
+  controllers: [AppController],
+  providers: [AppService, PrismaService],
 })
 export class AppModule {}
